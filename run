@@ -1,0 +1,21 @@
+#!/bin/sh
+JAVA_HOME=${JAVA_HOME:=/usr}
+JAVA=$JAVA_HOME/bin/java
+
+CP1=./ccnChat.jar
+CP2=lib/*
+CLASSPATH=$CP1:$CP2
+
+if [ "$1" = "sender" ]; then
+  CLASSNAME=CCNSender
+else
+  CLASSNAME=CCNReceiver
+fi
+
+if [ $# = 0 ]
+then
+  echo "usage: $0 (sender|receiver)"
+  exit 1
+fi
+
+sudo $JAVA -cp $CLASSPATH org.ccnx.ccn.apps.ccnchat.$CLASSNAME ccnx:/chat_room
