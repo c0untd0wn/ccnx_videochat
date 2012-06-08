@@ -40,6 +40,9 @@ import org.ccnx.ccn.apps.ccnchat.CCNChatNet.CCNChatCallback;
 import org.ccnx.ccn.config.ConfigurationException;
 import org.ccnx.ccn.protocol.MalformedContentNameStringException;
 
+import java.io.ByteArrayInputStream;
+import javax.imageio.ImageIO;
+
 
 /**
  * Based on a client/server chat example in Robert Sedgewick's Algorithms
@@ -109,7 +112,8 @@ public class CCNReceiver extends JFrame implements ActionListener, CCNChatCallba
 	 */
 	public void recvMessage(byte[] message) {
     try {
-        BufferedImage image = new BufferedImage(300,300,BufferedImage.TYPE_INT_ARGB);
+        BufferedImage image = ImageIO.read(new ByteArrayInputStream(message));
+	/*
         for (int i=0;i<100;i++)
           for(int j=0;j<100;j++)
           {
@@ -118,6 +122,7 @@ public class CCNReceiver extends JFrame implements ActionListener, CCNChatCallba
               for(int l=0;l<3;l++)
                 image.setRGB(i*3+k,j*3+l,color);
           }
+	*/
         ImageIcon ii = new ImageIcon(image);
         imageLabel.setIcon(ii);
         //_messagePane.setBackground(new Color(value,value,value));

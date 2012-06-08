@@ -28,6 +28,17 @@ import org.ccnx.ccn.apps.ccnchat.CCNChatNet.CCNChatCallback;
 import org.ccnx.ccn.config.ConfigurationException;
 import org.ccnx.ccn.protocol.MalformedContentNameStringException;
 
+import javax.imageio.ImageIO;
+import com.googlecode.javacpp.Loader;
+import com.googlecode.javacv.*;
+import static com.googlecode.javacv.cpp.opencv_core.*;
+import static com.googlecode.javacv.cpp.opencv_imgproc.*;
+import static com.googlecode.javacv.cpp.opencv_calib3d.*;
+import static com.googlecode.javacv.cpp.opencv_objdetect.*;
+
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayOutputStream;
+
 /**
  * A text-based interface to CCNChat.
  * 
@@ -71,16 +82,33 @@ public class CCNSender implements Runnable, CCNChatCallback {
 		}
 	}
 	
-	public void run() {
+	public void run()  {
 		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+
+//======================================
+		OpenCVFrameGrabber grabber = new OpenCVFrameGrabber(0);
+		IplImage image = null;
+
+		try{
+		grabber.start();
+		
+		image = grabber.grab();
+		
+		
+		CanvasFrame canvasFrame = new CanvasFrame("Web Cam Detection Going on");
+		canvasFrame.setCanvasSize(image.width(), image.height());
+		canvasFrame.setDefaultCloseOperation(CanvasFrame.EXIT_ON_CLOSE);
+//=====================================
 		
 		output("Mode = " + _mode + "\n");
 		output("Press ENTER to switch to INPUT mode.\n");
-		
+		} catch (Exception e){
+}
 		
 		
 		while (true) {
       try {
+	/*
         byte[] from = {(byte)(Math.random()*255),(byte)(Math.random()*255),(byte)(Math.random()*255)};
         byte[] to = {(byte)(Math.random()*255),(byte)(Math.random()*255),(byte)(Math.random()*255)};
         byte[] message = new byte[30000];
@@ -88,8 +116,24 @@ public class CCNSender implements Runnable, CCNChatCallback {
           for (int j=0;j<100;j++)
             for (int k=0;k<3;k++)
               message[i*300+j*3+k] = (byte)((from[k]*(i+j)+to[k]*(200-i-j))/200);
+	*/
         //for (int i=0;i<30000;i++)
           //message[i] = (byte)(Math.random()*255);
+	image=grabber.grab();
+	//canvasFrame.showImage(image);
+
+	// O P E N
+	ByteArrayOutputStream baos = new ByteArrayOutputStream( 1000 );
+
+	// W R I T E
+	ImageIO.write(image.getBufferedImage(), "jpeg", baos);
+
+	// C L O S E
+	baos.flush();
+	byte[] message = baos.toByteArray();
+
+	baos.close();
+
         _chat.sendMessage(message);
         output(" "+message[0]);
         Thread.sleep(100);

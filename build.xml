@@ -31,6 +31,10 @@
 	<property name="jarfile-base" value="ccnChat.jar"/>
 	<property name="jarfile" location="${jarfile-base}"/>
         <property name="ccnxjar" location="lib/ccn.jar"/>
+        <property name="javacppjar" location="lib/javacpp.jar"/>
+        <property name="javacvjar" location="lib/javacv.jar"/>
+        <property name="javacv-linuxjar" location="lib/javacv-linux-x86.jar"/>
+	
 	<!-- To enable remote debugging, the incantation is 
 	"-Xdebug -Xrunjdwp:transport=dt_socket,address=8000,server=y,suspend=n" -->
 
@@ -40,6 +44,9 @@
 	<path id="classpath">
 		<path refid="ccn-classpath"/>
                 <pathelement location="${ccnxjar}"/>
+                <pathelement location="${javacppjar}"/>
+                <pathelement location="${javacvjar}"/>
+                <pathelement location="${javacv-linuxjar}"/>
 	</path>
 
 	<path id="classpath-run">

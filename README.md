@@ -1,4 +1,5 @@
-ccnx_videochat-
-===============
+# ccnx_videochat
+Videochat using ccnx 
 
-ccnx videochat
+# Requirements
+* OpenCV must be installed on your machine in order to run ccnx_videochat
