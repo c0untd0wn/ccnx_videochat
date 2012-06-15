@@ -17,6 +17,9 @@ import org.ccnx.ccn.apps.ccnchat.CCNChatNet.CCNChatCallback;
 import org.ccnx.ccn.config.ConfigurationException;
 import org.ccnx.ccn.protocol.MalformedContentNameStringException;
 
+import com.googlecode.javacpp.Loader;
+import com.googlecode.javacv.*;
+
 
 public class CCNReceiver extends JFrame implements CCNChatCallback {
 	private static final long serialVersionUID = -8779269133035264361L;
@@ -24,6 +27,7 @@ public class CCNReceiver extends JFrame implements CCNChatCallback {
   protected Canvas _canvas = new Canvas();
   protected JLabel imageLabel = new JLabel();
   private final CCNChatNet _chat;
+	protected CanvasFrame canvasFrame = new CanvasFrame("Video Chat");
 
   public CCNReceiver(String namespace) throws MalformedContentNameStringException {
 
@@ -42,6 +46,7 @@ public class CCNReceiver extends JFrame implements CCNChatCallback {
       }
     );
 
+		/*
     Container content = getContentPane();
     imageLabel.setSize(300,300);
     content.add(imageLabel);
@@ -51,13 +56,20 @@ public class CCNReceiver extends JFrame implements CCNChatCallback {
     setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     pack();
     setVisible(true);
+		*/
+		canvasFrame.setCanvasSize(300, 300);
+    canvasFrame.setDefaultCloseOperation(CanvasFrame.EXIT_ON_CLOSE);
+
   }
 	
 	public void recvMessage(byte[] message) {
     try {
-      BufferedImage image = ImageIO.read(new ByteArrayInputStream(message));
+      BufferedImage bimage = ImageIO.read(new ByteArrayInputStream(message));
+			IplImage image = IplImage.createFrom(bimage);
+			/*
       ImageIcon ii = new ImageIcon(image);
       imageLabel.setIcon(ii);
+			*/
     } catch(Exception e) {
       e.printStackTrace();
     }
