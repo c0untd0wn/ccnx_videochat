@@ -19,6 +19,7 @@ import org.ccnx.ccn.protocol.MalformedContentNameStringException;
 
 import com.googlecode.javacpp.Loader;
 import com.googlecode.javacv.*;
+import com.googlecode.javacv.cpp.opencv_core.IplImage;
 
 
 public class CCNReceiver extends JFrame implements CCNChatCallback {
