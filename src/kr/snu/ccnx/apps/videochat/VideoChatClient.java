@@ -72,8 +72,10 @@ public class VideoChatClient implements Runnable, CCNChatCallback {
 			FFmpegFrameGrabber grabber = new FFmpegFrameGrabber(inputFile);
 			grabber.start();
 
-			for(int i=0; i<grabber.getLengthInFrames(); i++){
-				canvasFrame.showImage(grabber.grab());
+			while(true){
+				IplImage img = grabber.grab();
+				if(img == null) break;
+				canvasFrame.showImage(img);
 				Thread.sleep((long) (1000/grabber.getFrameRate()));
 			}
 
