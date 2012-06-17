@@ -6,16 +6,12 @@ CP1=./ccnChat.jar
 CP2=lib/*
 CLASSPATH=$CP1:$CP2
 
-if [ "$1" = "sender" ]; then
-  CLASSNAME=CCNSender
+if [ $# = 0 ]; then
+  CLASSNAME=kr.ac.snu.ccnx.apps.videochat.VideoChatClient
+elif [ "$1" = "sender" ]; then
+  CLASSNAME=org.ccnx.ccn.apps.ccnchat.CCNSender
 else
-  CLASSNAME=CCNReceiver
+  CLASSNAME=org.ccnx.ccn.apps.ccnchat.CCNReceiver
 fi
 
-if [ $# = 0 ]
-then
-  echo "usage: $0 (sender|receiver)"
-  exit 1
-fi
-
-sudo $JAVA -cp $CLASSPATH org.ccnx.ccn.apps.ccnchat.$CLASSNAME ccnx:/chat_room
+sudo $JAVA -cp $CLASSPATH $CLASSNAME ccnx:/chat_room
