@@ -6,7 +6,10 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.*;
 import java.util.logging.Level;
+import java.util.Date;
+import java.util.Timer;
 
 import javax.imageio.ImageIO;
 
@@ -18,9 +21,12 @@ import org.ccnx.ccn.protocol.MalformedContentNameStringException;
 import com.googlecode.javacpp.Loader;
 import com.googlecode.javacv.CanvasFrame;
 import com.googlecode.javacv.OpenCVFrameGrabber;
+import com.googlecode.javacv.FFmpegFrameGrabber;
+import com.googlecode.javacv.FrameRecorder;
 import com.googlecode.javacv.cpp.opencv_core.IplImage;
 
 public class VideoChatClient implements Runnable, CCNChatCallback {
+	private int sequence = 0;
 
 	public static void main(String[] args) {
     String namespace = "ccnx:/chat_room";
@@ -43,51 +49,49 @@ public class VideoChatClient implements Runnable, CCNChatCallback {
 	}
 
 	public void run()  {
-		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-
-		OpenCVFrameGrabber grabber = new OpenCVFrameGrabber(0);
-		IplImage image = null;
-
 		try {
-      grabber.start();
-		
-      image = grabber.grab();
-		
-      while (true) {
-        image = grabber.grab();
 
-        ByteArrayOutputStream baos = new ByteArrayOutputStream( 1000 );
-        ImageIO.write(image.getBufferedImage(), "jpeg", baos);
-        baos.flush();
-        byte[] message = baos.toByteArray();
-        baos.close();
-        chat.sendMessage(message);
+			Timer timer = new Timer();
+    	MyTimerTask timerTask = new MyTimerTask();
+    	MyTimerTask.init();
+    	timer.scheduleAtFixedRate(timerTask, new Date(), 3000 );
 
-        Thread.sleep(100);
-      }
 		} catch (Exception e) {
     }
 	}
 
   public void recvMessage(byte[] message) {
     try {
-      BufferedImage bimage = ImageIO.read(new ByteArrayInputStream(message));
-			IplImage image = IplImage.createFrom(bimage);
-      canvasFrame.showImage(image);
-    } catch(Exception e) {
-      e.printStackTrace();
-    }
-  }
+			++sequence;
+			File inputFile = new File("input" + sequence + ".wmv");
+			FileOutputStream fos = new FileOutputStream(inputFile);
+			fos.write(message);
+			fos.flush();
+			fos.close();
 
-  private final CCNChatNet chat;
-  private final Thread thread;
-  private CanvasFrame canvasFrame = new CanvasFrame("VideoChat");
+			FFmpegFrameGrabber grabber = new FFmpegFrameGrabber(inputFile);
+			grabber.start();
 
-  private VideoChatClient(String namespace) throws MalformedContentNameStringException {
-    chat = new CCNChatNet(this, namespace);
-    thread = new Thread(this, "VideoChatClient");
+			for(int i=0; i<grabber.getLengthInFrames(); i++){
+				canvasFrame.showImage(grabber.grab());
+				Thread.sleep((long) (1000/grabber.getFrameRate()));
+			}
 
-    canvasFrame.setCanvasSize(300, 300);
+			//canvasFrame.showImage(image);
+		} catch(Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+	public static CCNChatNet chat;
+	private final Thread thread;
+	private CanvasFrame canvasFrame = new CanvasFrame("VideoChat");
+
+	private VideoChatClient(String namespace) throws MalformedContentNameStringException {
+		chat = new CCNChatNet(this, namespace);
+		thread = new Thread(this, "VideoChatClient");
+
+		canvasFrame.setCanvasSize(300, 300);
     canvasFrame.setDefaultCloseOperation(CanvasFrame.EXIT_ON_CLOSE);
   }
 
