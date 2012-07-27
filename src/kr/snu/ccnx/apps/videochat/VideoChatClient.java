@@ -60,25 +60,24 @@ public class VideoChatClient implements Runnable, CCNChatCallback {
     }
 	}
 
-  public void recvMessage(byte[] message) {
+  public void recvMessage(String sender, byte[] message) {
     try {
 			++sequence;
-			File inputFile = new File("input" + sequence + ".wmv");
+			String filenamePrefix;
+			filenamePrefix = "input";
+			File inputFile = new File(filenamePrefix + sequence + ".wmv");
 			FileOutputStream fos = new FileOutputStream(inputFile);
 			fos.write(message);
 			fos.flush();
 			fos.close();
 
-			FFmpegFrameGrabber grabber = new FFmpegFrameGrabber(inputFile);
-			grabber.start();
+				FFmpegFrameGrabber grabber = new FFmpegFrameGrabber(inputFile);
+				grabber.start();
 
-			while(true){
-				IplImage img = grabber.grab();
-				if(img == null) break;
-				canvasFrame.showImage(img);
-				Thread.sleep((long) (1000/grabber.getFrameRate()));
+				for(int i=0; i<grabber.getLengthInFrames(); i++){
+					canvasFrame.showImage(grabber.grab());
+					Thread.sleep((long) (1000/grabber.getFrameRate()));
 			}
-
 			//canvasFrame.showImage(image);
 		} catch(Exception e) {
 			e.printStackTrace();

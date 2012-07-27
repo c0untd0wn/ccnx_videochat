@@ -60,7 +60,7 @@ public final class CCNChatNet {
 		 * Receive a message from the network
 		 * @param message
 		 */
-		public void recvMessage(byte[] message);
+		public void recvMessage(String sender, byte[] message);
 	}
 	
     // ==================================================================
@@ -129,6 +129,7 @@ public final class CCNChatNet {
 		} else {
 			UserConfiguration.setDefaultNamespacePrefix(_namespace.toString());
 		}
+		UserConfiguration.setUserName("user1");
 
 		CCNHandle tempReadHandle = CCNHandle.getHandle();
 
@@ -136,11 +137,11 @@ public final class CCNChatNet {
 		// written when nobody else is reading.
 		CCNHandle tempWriteHandle = CCNHandle.open();
 
-		_readString = new CCNByteObject(_namespace, (byte[])null, SaveType.RAW, tempReadHandle);
+		_readString = new CCNByteObject(ContentName.fromURI(_namespaceStr + "/user2"), (byte[])null, SaveType.RAW, tempReadHandle);
 		_readString.updateInBackground(true); 
 		
 		String introduction = UserConfiguration.userName() + " has entered " + _namespace;
-		_writeString = new CCNByteObject(_namespace, introduction.getBytes(), SaveType.RAW, tempWriteHandle);
+		_writeString = new CCNByteObject(ContentName.fromURI(_namespaceStr + "/user1"), introduction.getBytes(), SaveType.RAW, tempWriteHandle);
 		_writeString.save();
 
 		// Publish the user's friendly name under a new ContentName
@@ -214,7 +215,9 @@ public final class CCNChatNet {
 						 
 						} else {
 							showMessage(userFriendlyName, thisUpdate, _readString.byteArray());	
+
 						}				
+						Log.warning("############ " + _readString.getPublisherKeyLocator());
 				}	
 			}
 		}
@@ -268,7 +271,8 @@ public final class CCNChatNet {
 	 * @param message
 	 */
 	private void showMessage(String sender, Timestamp time, byte[] message) {
-    _callback.recvMessage(message);
+		//if(sender.equals("operatz"))
+	    _callback.recvMessage(sender, message);
 		//_callback.recvMessage(("[" + sender + " " + DATE_FORMAT.format(time) + "]: " + message + "\n").getBytes());
  	}
 	

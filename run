@@ -14,4 +14,4 @@ else
   CLASSNAME=org.ccnx.ccn.apps.ccnchat.CCNReceiver
 fi
 
-sudo $JAVA -cp $CLASSPATH $CLASSNAME ccnx:/chat_room
+sudo $JAVA -cp $CLASSPATH $CLASSNAME ccnx:/snu.ac.kr/chat_room
